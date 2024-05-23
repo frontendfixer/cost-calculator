@@ -1,18 +1,18 @@
-import "~/styles/globals.css";
+import '~/styles/globals.css';
 
-import { GeistSans } from "geist/font/sans";
-import { Inter as FontSans } from "next/font/google"
-import { cn } from "~/lib/utils";
+import { Inter as FontSans } from 'next/font/google';
+import { cn } from '~/lib/utils';
+import Providers from './Context/Providers';
 
 const fontSans = FontSans({
-  subsets: ["latin"],
-  variable: "--font-sans",
-})
+  subsets: ['latin'],
+  variable: '--font-sans',
+});
 
 export const metadata = {
-  title: "Cost Calculator",
-  description: "Manage your costs with ease",
-  icons: [{ rel: "icon", url: "/favicon.ico" }],
+  title: 'Cost Calculator',
+  description: 'Manage your costs with ease',
+  icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
 export default function RootLayout({
@@ -21,8 +21,16 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={cn("font-sans antialiased", fontSans.variable, GeistSans.variable)}>
-      <body>{children}</body>
+    <html
+      lang="en"
+      className={cn(
+        'bg-background font-sans text-foreground antialiased',
+        fontSans.variable,
+      )}
+    >
+      <body>
+        <Providers>{children}</Providers>
+      </body>
     </html>
   );
 }
