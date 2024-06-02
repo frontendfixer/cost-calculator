@@ -14,28 +14,7 @@ import { type AdapterAccount } from 'next-auth/adapters';
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = sqliteTableCreator(
-  name => `cost_calculator_${name}`,
-);
-
-export const posts = createTable(
-  'post',
-  {
-    id: int('id', { mode: 'number' }).primaryKey({ autoIncrement: true }),
-    name: text('name', { length: 256 }),
-    createdById: text('createdById', { length: 255 })
-      .notNull()
-      .references(() => users.id),
-    createdAt: int('created_at', { mode: 'timestamp' })
-      .default(sql`CURRENT_TIMESTAMP`)
-      .notNull(),
-    updatedAt: int('updatedAt', { mode: 'timestamp' }),
-  },
-  example => ({
-    createdByIdIdx: index('createdById_idx').on(example.createdById),
-    nameIndex: index('name_idx').on(example.name),
-  }),
-);
+export const createTable = sqliteTableCreator(name => name);
 
 export const users = createTable('user', {
   id: text('id', { length: 255 }).notNull().primaryKey(),
@@ -45,6 +24,7 @@ export const users = createTable('user', {
     mode: 'timestamp',
   }).default(sql`CURRENT_TIMESTAMP`),
   image: text('image', { length: 255 }),
+  role: text('role', { enum: ['user', 'admin'] }).default('user'),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({

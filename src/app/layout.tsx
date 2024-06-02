@@ -15,20 +15,20 @@ export const metadata = {
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
 };
 
-export default function RootLayout({
-  children,
-}: {
+interface RootLayoutProps {
   children: React.ReactNode;
-}) {
+}
+
+export default function RootLayout({ children }: RootLayoutProps) {
   return (
-    <html
-      lang="en"
-      className={cn(
-        'bg-background font-sans text-foreground antialiased',
-        fontSans.variable,
-      )}
-    >
-      <body>
+    <html lang="en" suppressHydrationWarning>
+      <head />
+      <body
+        className={cn(
+          'bg-background font-sans text-foreground antialiased',
+          fontSans.variable,
+        )}
+      >
         <Providers>{children}</Providers>
       </body>
     </html>

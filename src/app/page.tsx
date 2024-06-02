@@ -1,4 +1,3 @@
-import Image from 'next/image';
 import {
   Card,
   CardContent,
@@ -7,36 +6,29 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
-import { LockIcon } from 'lucide-react';
 import SignInButton from '~/components/SignInButton';
+import { constants } from '~/constants';
+import Logo from '~/components/Logo';
 
 export default function HomePage() {
   return (
     <main className="flex h-screen flex-col items-center justify-center p-4">
-      <Card className="shadow-lg">
+      <Card className="w-[90vw] max-w-md shadow-lg">
         <CardHeader>
           <CardTitle className="text-2xl font-bold md:text-3xl">
-            Cost Calculator
+            {constants.app_name}
           </CardTitle>
-          <CardDescription>Manage your costs with ease</CardDescription>
+          <CardDescription>{constants.app_description}</CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="flex flex-col items-center justify-center gap-8">
-            <Image
-              src={'/logo.svg'}
-              width={72}
-              height={72}
-              alt="logo"
-              priority
-            />
+          <div className="my-8 flex flex-col items-center justify-center gap-8">
+            <Logo className="size-[120px]" />
             <SignInButton />
           </div>
         </CardContent>
-        <CardFooter className="text-muted-foreground">
-          <div className="flex items-center gap-4 text-sm">
-            <LockIcon size={16} />
-            All right reserved and secured.
-          </div>
+        <CardFooter className="justify-between gap-4 text-xs text-muted-foreground">
+          <p>All right reserved © {new Date().getFullYear()}</p>
+          <p> v.{constants.app_version}</p>
         </CardFooter>
       </Card>
     </main>
