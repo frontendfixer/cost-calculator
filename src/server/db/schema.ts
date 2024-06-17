@@ -1,11 +1,15 @@
 import { relations, sql } from 'drizzle-orm';
+import { cuid2 as cuid } from 'drizzle-cuid2/mysql';
 import {
   index,
   int,
+  mysqlEnum,
+  mysqlTableCreator,
   primaryKey,
-  sqliteTableCreator,
   text,
-} from 'drizzle-orm/sqlite-core';
+  timestamp,
+  varchar,
+} from 'drizzle-orm/mysql-core';
 import { type AdapterAccount } from 'next-auth/adapters';
 
 /**
@@ -14,41 +18,55 @@ import { type AdapterAccount } from 'next-auth/adapters';
  *
  * @see https://orm.drizzle.team/docs/goodies#multi-project-schema
  */
-export const createTable = sqliteTableCreator(name => name);
+export const createTable = mysqlTableCreator(name => `cc_${name}`);
 
 export const users = createTable('user', {
-  id: text('id', { length: 255 }).notNull().primaryKey(),
-  name: text('name', { length: 255 }),
-  email: text('email', { length: 255 }).notNull(),
-  emailVerified: int('emailVerified', {
-    mode: 'timestamp',
-  }).default(sql`CURRENT_TIMESTAMP`),
-  image: text('image', { length: 255 }),
-  role: text('role', { enum: ['user', 'admin'] }).default('user'),
+  id: varchar('id', { length: 255 }).notNull().primaryKey(),
+  name: varchar('name', { length: 255 }),
+  email: varchar('email', { length: 255 }).notNull(),
+  emailVerified: timestamp('emailVerified', {
+    mode: 'date',
+    fsp: 3,
+  }).default(sql`CURRENT_TIMESTAMP(3)`),
+  image: varchar('image', { length: 255 }),
+  role: mysqlEnum('role', ['user', 'admin']).notNull().default('user'),
+
+  createdAt: timestamp('created_at', {
+    mode: 'date',
+    fsp: 3,
+  }).default(sql`CURRENT_TIMESTAMP(3)`),
+  updatedAt: timestamp('updated_at', {
+    mode: 'date',
+    fsp: 3,
+  }).default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const usersRelations = relations(users, ({ many }) => ({
   accounts: many(accounts),
+  sessions: many(sessions),
+  dailyExpenseLists: many(dailyExpenseList),
 }));
 
 export const accounts = createTable(
   'account',
   {
-    userId: text('userId', { length: 255 })
+    userId: varchar('userId', { length: 255 })
       .notNull()
-      .references(() => users.id),
-    type: text('type', { length: 255 })
+      .references(() => users.id, { onDelete: 'cascade' }),
+    type: varchar('type', { length: 255 })
       .$type<AdapterAccount['type']>()
       .notNull(),
-    provider: text('provider', { length: 255 }).notNull(),
-    providerAccountId: text('providerAccountId', { length: 255 }).notNull(),
+    provider: varchar('provider', { length: 255 }).notNull(),
+    providerAccountId: varchar('providerAccountId', {
+      length: 255,
+    }).notNull(),
     refresh_token: text('refresh_token'),
     access_token: text('access_token'),
     expires_at: int('expires_at'),
-    token_type: text('token_type', { length: 255 }),
-    scope: text('scope', { length: 255 }),
+    token_type: varchar('token_type', { length: 255 }),
+    scope: varchar('scope', { length: 255 }),
     id_token: text('id_token'),
-    session_state: text('session_state', { length: 255 }),
+    session_state: varchar('session_state', { length: 255 }),
   },
   account => ({
     compoundKey: primaryKey({
@@ -65,11 +83,13 @@ export const accountsRelations = relations(accounts, ({ one }) => ({
 export const sessions = createTable(
   'session',
   {
-    sessionToken: text('sessionToken', { length: 255 }).notNull().primaryKey(),
-    userId: text('userId', { length: 255 })
+    sessionToken: varchar('session_token', { length: 255 })
+      .notNull()
+      .primaryKey(),
+    userId: varchar('userId', { length: 255 })
       .notNull()
       .references(() => users.id),
-    expires: int('expires', { mode: 'timestamp' }).notNull(),
+    expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
   session => ({
     userIdIdx: index('session_userId_idx').on(session.userId),
@@ -83,11 +103,40 @@ export const sessionsRelations = relations(sessions, ({ one }) => ({
 export const verificationTokens = createTable(
   'verificationToken',
   {
-    identifier: text('identifier', { length: 255 }).notNull(),
-    token: text('token', { length: 255 }).notNull(),
-    expires: int('expires', { mode: 'timestamp' }).notNull(),
+    identifier: varchar('identifier', { length: 255 }).notNull(),
+    token: varchar('token', { length: 255 }).notNull(),
+    expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
   vt => ({
     compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+  }),
+);
+
+export const dailyExpenseList = createTable('daily_expense_list', {
+  id: cuid('id').defaultRandom().primaryKey(),
+  userId: varchar('user_id', { length: 255 })
+    .notNull()
+    .references(() => users.id),
+  date: timestamp('date', {
+    mode: 'date',
+    fsp: 3,
+  }).notNull(),
+  amount: int('amount').notNull(),
+  category: mysqlEnum('category', ['Food', 'Grocery', 'Entertainment', 'Other'])
+    .notNull()
+    .default('Other'),
+  paymentMethod: mysqlEnum('payment_method', ['Cash', 'Online', 'Other'])
+    .notNull()
+    .default('Cash'),
+  title: varchar('title', { length: 255 }).notNull(),
+});
+
+export const dailyExpenseListRelations = relations(
+  dailyExpenseList,
+  ({ one }) => ({
+    user: one(users, {
+      fields: [dailyExpenseList.userId],
+      references: [users.id],
+    }),
   }),
 );

@@ -1,8 +1,8 @@
 import { getServerAuthSession } from '~/server/auth';
-import { getUser } from './actions';
 import Image from 'next/image';
 import { placeholderBlurHash } from '~/lib/utils';
 import SignOutButton from '~/components/SignOutButton';
+import { getUser } from '../actions';
 
 const ProfilePage = async () => {
   const session = await getServerAuthSession();

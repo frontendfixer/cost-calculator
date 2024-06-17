@@ -1,6 +1,6 @@
 import Logo from '~/components/Logo';
-import ThemeSwitcher from '~/components/ThemeSelector';
 import { constants } from '~/constants';
+import AddItemModal from './AddItemModal';
 
 const Header = () => {
   return (
@@ -9,7 +9,7 @@ const Header = () => {
         <Logo className="size-6" />
         <h2 className="font-semibold">{constants.app_name}</h2>
       </div>
-      <ThemeSwitcher />
+      <AddItemModal />
     </header>
   );
 };
