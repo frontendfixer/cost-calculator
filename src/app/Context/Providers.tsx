@@ -3,21 +3,22 @@
 import { ThemeProvider } from './ThemeProviders';
 import { Toaster } from 'react-hot-toast';
 import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
-import { useIsClient } from '~/hooks/useIsClient';
+import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 
 const ReactQueryProvider = ({ children }: { children: React.ReactNode }) => {
-  const isClient = useIsClient();
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
         refetchOnWindowFocus: false,
-        enabled: isClient,
       },
     },
   });
 
   return (
-    <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      {children}
+      <ReactQueryDevtools initialIsOpen={false} />
+    </QueryClientProvider>
   );
 };
 

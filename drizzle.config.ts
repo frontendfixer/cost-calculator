@@ -5,7 +5,7 @@ import { env } from '~/env';
 export default {
   schema: './src/server/db/schema.ts',
   dialect: 'mysql',
-  out: './src/server/db/drizzle',
+  out: './database',
   dbCredentials: {
     url: env.DATABASE_URL,
   },

@@ -6,7 +6,6 @@ import {
   mysqlEnum,
   mysqlTableCreator,
   primaryKey,
-  text,
   timestamp,
   varchar,
 } from 'drizzle-orm/mysql-core';
@@ -53,26 +52,21 @@ export const accounts = createTable(
     userId: varchar('userId', { length: 255 })
       .notNull()
       .references(() => users.id, { onDelete: 'cascade' }),
-    type: varchar('type', { length: 255 })
-      .$type<AdapterAccount['type']>()
-      .notNull(),
+    type: varchar('type', { length: 255 }).$type<AdapterAccount>().notNull(),
     provider: varchar('provider', { length: 255 }).notNull(),
-    providerAccountId: varchar('providerAccountId', {
-      length: 255,
-    }).notNull(),
-    refresh_token: text('refresh_token'),
-    access_token: text('access_token'),
+    providerAccountId: varchar('providerAccountId', { length: 255 }).notNull(),
+    refresh_token: varchar('refresh_token', { length: 255 }),
+    access_token: varchar('access_token', { length: 255 }),
     expires_at: int('expires_at'),
     token_type: varchar('token_type', { length: 255 }),
     scope: varchar('scope', { length: 255 }),
-    id_token: text('id_token'),
+    id_token: varchar('id_token', { length: 2048 }),
     session_state: varchar('session_state', { length: 255 }),
   },
   account => ({
     compoundKey: primaryKey({
       columns: [account.provider, account.providerAccountId],
     }),
-    userIdIdx: index('account_userId_idx').on(account.userId),
   }),
 );
 
@@ -88,7 +82,7 @@ export const sessions = createTable(
       .primaryKey(),
     userId: varchar('userId', { length: 255 })
       .notNull()
-      .references(() => users.id),
+      .references(() => users.id, { onDelete: 'cascade' }),
     expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
   session => ({
@@ -107,8 +101,10 @@ export const verificationTokens = createTable(
     token: varchar('token', { length: 255 }).notNull(),
     expires: timestamp('expires', { mode: 'date' }).notNull(),
   },
-  vt => ({
-    compoundKey: primaryKey({ columns: [vt.identifier, vt.token] }),
+  verificationToken => ({
+    compositePk: primaryKey({
+      columns: [verificationToken.identifier, verificationToken.token],
+    }),
   }),
 );
 
@@ -117,18 +113,33 @@ export const dailyExpenseList = createTable('daily_expense_list', {
   userId: varchar('user_id', { length: 255 })
     .notNull()
     .references(() => users.id),
+  transaction_type: mysqlEnum('transaction_type', ['credit', 'debit'])
+    .notNull()
+    .default('credit'),
   date: timestamp('date', {
     mode: 'date',
     fsp: 3,
   }).notNull(),
   amount: int('amount').notNull(),
-  category: mysqlEnum('category', ['Food', 'Grocery', 'Entertainment', 'Other'])
+  category: mysqlEnum('category', ['food', 'grocery', 'entertainment', 'other'])
     .notNull()
-    .default('Other'),
-  paymentMethod: mysqlEnum('payment_method', ['Cash', 'Online', 'Other'])
+    .default('other'),
+  paymentMethod: mysqlEnum('payment_method', ['cash', 'online'])
     .notNull()
-    .default('Cash'),
+    .default('cash'),
   title: varchar('title', { length: 255 }).notNull(),
+  status: mysqlEnum('status', ['active', 'inactive', 'deleted']).default(
+    'active',
+  ),
+
+  createdAt: timestamp('created_at', {
+    mode: 'date',
+    fsp: 3,
+  }).default(sql`CURRENT_TIMESTAMP(3)`),
+  updatedAt: timestamp('updated_at', {
+    mode: 'date',
+    fsp: 3,
+  }).default(sql`CURRENT_TIMESTAMP(3)`),
 });
 
 export const dailyExpenseListRelations = relations(

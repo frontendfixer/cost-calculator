@@ -2,12 +2,12 @@ import { getServerAuthSession } from '~/server/auth';
 import Image from 'next/image';
 import { placeholderBlurHash } from '~/lib/utils';
 import SignOutButton from '~/components/SignOutButton';
-import { getUser } from '../actions';
+import { User } from '../actions';
 
 const ProfilePage = async () => {
   const session = await getServerAuthSession();
   const userId = session?.user?.id;
-  const user = await getUser(userId!);
+  const user = await User.get(userId!);
 
   if (!user) return <div>user not found</div>;
   return (

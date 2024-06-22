@@ -37,18 +37,19 @@ import { Input } from '~/components/ui/input';
 import { Calendar } from '~/components/ui/calendar';
 import { cn } from '~/lib/utils';
 import toast from 'react-hot-toast';
-import { addItem } from '../actions';
-import { useMutation } from '@tanstack/react-query';
+import { Transactions } from '../actions';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { StatusCodes } from 'http-status-codes';
 import { useState } from 'react';
 import Icon from '~/components/Icon';
 
 export const AddItemSchema = z.object({
+  transaction_type: z.enum(['credit', 'debit']),
   date: z.date(),
   amount: z.string().regex(/^[0-9]+$/, 'Amount must be a number'),
-  category: z.enum(['Food', 'Grocery', 'Entertainment', 'Other']),
-  payment_method: z.enum(['Cash', 'Online', 'Other']),
-  title: z.string().optional(),
+  category: z.enum(['food', 'grocery', 'entertainment', 'other']),
+  payment_method: z.enum(['cash', 'online']),
+  title: z.string().min(1, { message: 'Title is required' }),
 });
 
 export type TAddItemSchema = z.infer<typeof AddItemSchema>;
@@ -58,22 +59,25 @@ export default function AddItemModal() {
   const form = useForm<TAddItemSchema>({
     resolver: zodResolver(AddItemSchema),
     defaultValues: {
+      transaction_type: 'debit',
       date: new Date(),
       amount: '',
-      category: 'Other',
-      payment_method: 'Cash',
+      category: 'other',
+      payment_method: 'cash',
       title: '',
     },
   });
 
+  const queryClient = useQueryClient();
   const SubmitMutation = useMutation({
     mutationKey: ['add-item'],
-    mutationFn: async (data: TAddItemSchema) => await addItem(data),
-    onSuccess: resp => {
+    mutationFn: async (data: TAddItemSchema) => await Transactions.add(data),
+    onSuccess: async resp => {
       if (resp.status === StatusCodes.OK) {
         toast.success(resp.message);
         form.reset();
         setOpen(false);
+        await queryClient.invalidateQueries({ queryKey: ['spending-list'] });
       } else {
         toast.error(resp.message);
       }
@@ -100,25 +104,32 @@ export default function AddItemModal() {
             onSubmit={form.handleSubmit(data => SubmitMutation.mutate(data))}
             className="space-y-4"
           >
+            <FormInputSelect
+              form={form}
+              name="transaction_type"
+              options={[
+                { label: 'Income', value: 'credit' },
+                { label: 'Expense', value: 'debit' },
+              ]}
+            />
             <FormInputDateOnly form={form} name="date" />
             <FormInput type="number" formObj={form} name="amount" />
             <FormInputSelect
               form={form}
               name="category"
               options={[
-                { label: 'Food', value: 'Food' },
-                { label: 'Grocery', value: 'Grocery' },
-                { label: 'Entertainment', value: 'Entertainment' },
-                { label: 'Other', value: 'Other' },
+                { label: 'Food', value: 'food' },
+                { label: 'Grocery', value: 'grocery' },
+                { label: 'Entertainment', value: 'entertainment' },
+                { label: 'Other', value: 'other' },
               ]}
             />
             <FormInputSelect
               form={form}
               name="payment_method"
               options={[
-                { label: 'Cash', value: 'Cash' },
-                { label: 'Online', value: 'Online' },
-                { label: 'Other', value: 'Other' },
+                { label: 'Cash', value: 'cash' },
+                { label: 'Online', value: 'online' },
               ]}
             />
             <FormInput formObj={form} name="title" />
@@ -145,6 +156,7 @@ const FormInputSchema = AddItemSchema.omit({
   date: true,
   category: true,
   payment_method: true,
+  transaction_type: true,
 });
 type TFormInputSchema = z.infer<typeof FormInputSchema>;
 
@@ -223,6 +235,7 @@ export function FormInputDateOnly({
 const FormInputSelectSchema = AddItemSchema.pick({
   category: true,
   payment_method: true,
+  transaction_type: true,
 });
 type TFormInputSelectSchema = z.infer<typeof FormInputSelectSchema>;
 export function FormInputSelect({
