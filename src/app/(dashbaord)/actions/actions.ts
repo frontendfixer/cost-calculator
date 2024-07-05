@@ -23,6 +23,7 @@ export async function addItem(item: TAddItemSchema) {
       message: 'User not found',
     };
   }
+
   const query = await db.insert(dailyExpenseList).values({
     userId: user_id,
     transaction_type: item.transaction_type,
@@ -50,24 +51,15 @@ export async function listItems() {
     session => session?.user?.id,
   );
   if (!user_id) {
-    return {
-      status: StatusCodes.UNAUTHORIZED,
-      message: 'Invalid user request',
-    };
+    throw new Error('User not found');
   }
-  const user = await getUser(user_id);
-  if (!user)
-    return {
-      status: StatusCodes.UNAUTHORIZED,
-      message: 'User not found',
-    };
 
   const query = await db
     .select()
     .from(dailyExpenseList)
     .where(
       and(
-        eq(dailyExpenseList.userId, user.id),
+        eq(dailyExpenseList.userId, user_id),
         eq(dailyExpenseList.status, 'active'),
         between(
           dailyExpenseList.date,
@@ -85,6 +77,7 @@ export async function listItems() {
       amount: item.amount,
       category: item.category,
       date: format(new Date(item.date), 'do MMMM yyyy'),
+      time: format(new Date(item.date), 'h:mm a'),
       payment_method: item.paymentMethod,
       title: item.title,
     };
@@ -94,6 +87,44 @@ export async function listItems() {
     status: StatusCodes.OK,
     message: 'Items fetched successfully',
     data,
+  };
+}
+
+export async function spendingStat() {
+  const user_id = await getServerAuthSession().then(
+    session => session?.user?.id,
+  );
+  if (!user_id) {
+    throw new Error('User not found');
+  }
+  const query = await db
+    .select()
+    .from(dailyExpenseList)
+    .where(
+      and(
+        eq(dailyExpenseList.userId, user_id),
+        eq(dailyExpenseList.status, 'active'),
+        between(
+          dailyExpenseList.date,
+          startOfMonth(new Date()),
+          endOfMonth(new Date()),
+        ),
+      ),
+    );
+
+  const totalIncome = query
+    .filter(item => item.transaction_type === 'credit')
+    .reduce((acc, item) => acc + item.amount, 0);
+  const totalExpense = query
+    .filter(item => item.transaction_type === 'debit')
+    .reduce((acc, item) => acc + item.amount, 0);
+  return {
+    status: StatusCodes.OK,
+    message: 'Items fetched successfully',
+    data: {
+      totalIncome: totalIncome < 0 ? 0 : totalIncome,
+      totalExpense: totalExpense < 0 ? 0 : totalExpense,
+    },
   };
 }
 

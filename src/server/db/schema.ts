@@ -121,7 +121,15 @@ export const dailyExpenseList = createTable('daily_expense_list', {
     fsp: 3,
   }).notNull(),
   amount: int('amount').notNull(),
-  category: mysqlEnum('category', ['food', 'grocery', 'entertainment', 'other'])
+  category: mysqlEnum('category', [
+    'food',
+    'grocery',
+    'entertainment',
+    'other',
+    'salary',
+    'loan',
+    'investment',
+  ])
     .notNull()
     .default('other'),
   paymentMethod: mysqlEnum('payment_method', ['cash', 'online'])

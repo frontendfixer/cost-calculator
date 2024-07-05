@@ -7,30 +7,15 @@ import { Button } from '~/components/ui/button';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { format } from 'date-fns';
 import { CalendarIcon } from 'lucide-react';
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '~/components/ui/dialog';
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from '~/components/ui/popover';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
+import * as Dialog from '~/components/ui/dialog';
+import * as Popover from '~/components/ui/popover';
+import * as Select from '~/components/ui/select';
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
+  FormLabel,
   FormMessage,
 } from '~/components/ui/form';
 import { Input } from '~/components/ui/input';
@@ -42,12 +27,21 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import { StatusCodes } from 'http-status-codes';
 import { useState } from 'react';
 import Icon from '~/components/Icon';
+import { queryKeys } from '~/app/Context/QueryKeys';
 
 export const AddItemSchema = z.object({
   transaction_type: z.enum(['credit', 'debit']),
   date: z.date(),
   amount: z.string().regex(/^[0-9]+$/, 'Amount must be a number'),
-  category: z.enum(['food', 'grocery', 'entertainment', 'other']),
+  category: z.enum([
+    'food',
+    'grocery',
+    'entertainment',
+    'other',
+    'salary',
+    'loan',
+    'investment',
+  ]),
   payment_method: z.enum(['cash', 'online']),
   title: z.string().min(1, { message: 'Title is required' }),
 });
@@ -69,6 +63,18 @@ export default function AddItemModal() {
   });
 
   const queryClient = useQueryClient();
+  const invalidateQueries = async () => {
+    return await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: [queryKeys.spendingList],
+        exact: true,
+      }),
+      queryClient.invalidateQueries({
+        queryKey: [queryKeys.spendingStatistic],
+        exact: true,
+      }),
+    ]);
+  };
   const SubmitMutation = useMutation({
     mutationKey: ['add-item'],
     mutationFn: async (data: TAddItemSchema) => await Transactions.add(data),
@@ -77,7 +83,7 @@ export default function AddItemModal() {
         toast.success(resp.message);
         form.reset();
         setOpen(false);
-        await queryClient.invalidateQueries({ queryKey: ['spending-list'] });
+        await invalidateQueries();
       } else {
         toast.error(resp.message);
       }
@@ -89,16 +95,19 @@ export default function AddItemModal() {
   });
 
   return (
-    <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger>
+    <Dialog.Dialog open={open} onOpenChange={setOpen}>
+      <Dialog.DialogTrigger>
         <Button size="icon" asChild>
           <Plus size={16} />
         </Button>
-      </DialogTrigger>
-      <DialogContent>
-        <DialogHeader>
-          <DialogTitle>Add new</DialogTitle>
-        </DialogHeader>
+      </Dialog.DialogTrigger>
+      <Dialog.DialogContent>
+        <Dialog.DialogHeader className="border-b pb-3">
+          <Dialog.DialogTitle className="text-2xl">Add Item</Dialog.DialogTitle>
+          <Dialog.DialogDescription>
+            Add a new item to your spending list
+          </Dialog.DialogDescription>
+        </Dialog.DialogHeader>
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(data => SubmitMutation.mutate(data))}
@@ -107,36 +116,53 @@ export default function AddItemModal() {
             <FormInputSelect
               form={form}
               name="transaction_type"
+              label="Transaction type"
               options={[
                 { label: 'Income', value: 'credit' },
                 { label: 'Expense', value: 'debit' },
               ]}
             />
-            <FormInputDateOnly form={form} name="date" />
-            <FormInput type="number" formObj={form} name="amount" />
+            <FormInputDateOnly form={form} name="date" label="Select Date" />
+            <FormInput
+              type="number"
+              formObj={form}
+              name="amount"
+              label="Amount"
+            />
             <FormInputSelect
               form={form}
               name="category"
-              options={[
-                { label: 'Food', value: 'food' },
-                { label: 'Grocery', value: 'grocery' },
-                { label: 'Entertainment', value: 'entertainment' },
-                { label: 'Other', value: 'other' },
-              ]}
+              label="Category"
+              options={
+                form.getValues('transaction_type') === 'debit'
+                  ? [
+                      { label: 'Food', value: 'food' },
+                      { label: 'Grocery', value: 'grocery' },
+                      { label: 'Entertainment', value: 'entertainment' },
+                      { label: 'Investment', value: 'investment' },
+                      { label: 'Other', value: 'other' },
+                    ]
+                  : [
+                      { label: 'Salary', value: 'salary' },
+                      { label: 'Loan', value: 'loan' },
+                      { label: 'Other', value: 'other' },
+                    ]
+              }
             />
             <FormInputSelect
               form={form}
               name="payment_method"
+              label="Payment method"
               options={[
                 { label: 'Cash', value: 'cash' },
                 { label: 'Online', value: 'online' },
               ]}
             />
-            <FormInput formObj={form} name="title" />
+            <FormInput formObj={form} name="title" label="Title" />
             <Button
               type="submit"
               disabled={SubmitMutation.isPending}
-              className="w-full py-4"
+              className="w-full"
             >
               {SubmitMutation.isPending ? (
                 <Icon name="RotateCw" className="animate-spin" size={16} />
@@ -147,8 +173,8 @@ export default function AddItemModal() {
             </Button>
           </form>
         </Form>
-      </DialogContent>
-    </Dialog>
+      </Dialog.DialogContent>
+    </Dialog.Dialog>
   );
 }
 
@@ -163,14 +189,16 @@ type TFormInputSchema = z.infer<typeof FormInputSchema>;
 interface TFormInput extends React.InputHTMLAttributes<HTMLInputElement> {
   formObj: UseFormReturn<TAddItemSchema>;
   name: keyof TFormInputSchema;
+  label?: string;
 }
-export function FormInput({ formObj, name, ...props }: TFormInput) {
+export function FormInput({ formObj, name, label, ...props }: TFormInput) {
   return (
     <FormField
       control={formObj.control}
       name={name}
       render={({ field }) => (
         <FormItem>
+          <FormLabel>{label}</FormLabel>
           <FormControl>
             <Input {...props} placeholder="Enter value" {...field} />
           </FormControl>
@@ -186,9 +214,11 @@ type TDateSchema = z.infer<typeof DateSchema>;
 export function FormInputDateOnly({
   form,
   name,
+  label,
 }: {
   form: UseFormReturn<TAddItemSchema>;
   name: keyof TDateSchema;
+  label?: string;
 }) {
   return (
     <FormField
@@ -196,8 +226,9 @@ export function FormInputDateOnly({
       name={name}
       render={({ field }) => (
         <FormItem className="flex flex-col">
-          <Popover>
-            <PopoverTrigger asChild>
+          <FormLabel>{label}</FormLabel>
+          <Popover.Popover>
+            <Popover.PopoverTrigger asChild>
               <FormControl>
                 <Button
                   variant={'outline'}
@@ -214,17 +245,17 @@ export function FormInputDateOnly({
                   <CalendarIcon className="ml-auto size-4 opacity-60" />
                 </Button>
               </FormControl>
-            </PopoverTrigger>
-            <PopoverContent className="w-full p-0" align="start">
+            </Popover.PopoverTrigger>
+            <Popover.PopoverContent className="w-full p-0" align="start">
               <Calendar
                 mode="single"
                 selected={field.value}
                 onSelect={field.onChange}
                 disableNavigation
-                initialFocus
+                weekStartsOn={1}
               />
-            </PopoverContent>
-          </Popover>
+            </Popover.PopoverContent>
+          </Popover.Popover>
           <FormMessage />
         </FormItem>
       )}
@@ -241,10 +272,12 @@ type TFormInputSelectSchema = z.infer<typeof FormInputSelectSchema>;
 export function FormInputSelect({
   form,
   name,
+  label,
   options,
 }: {
   form: UseFormReturn<TAddItemSchema>;
   name: keyof TFormInputSelectSchema;
+  label?: string;
   options: { label: string; value: string }[];
 }) {
   return (
@@ -253,20 +286,24 @@ export function FormInputSelect({
       name={name}
       render={({ field }) => (
         <FormItem>
-          <Select onValueChange={field.onChange} defaultValue={field.value}>
+          <FormLabel>{label}</FormLabel>
+          <Select.Select
+            onValueChange={field.onChange}
+            defaultValue={field.value}
+          >
             <FormControl>
-              <SelectTrigger>
-                <SelectValue placeholder="Select a value" />
-              </SelectTrigger>
+              <Select.SelectTrigger>
+                <Select.SelectValue placeholder="Select a value" />
+              </Select.SelectTrigger>
             </FormControl>
-            <SelectContent>
+            <Select.SelectContent>
               {options.map(option => (
-                <SelectItem key={option.value} value={option.value}>
+                <Select.SelectItem key={option.value} value={option.value}>
                   {option.label}
-                </SelectItem>
+                </Select.SelectItem>
               ))}
-            </SelectContent>
-          </Select>
+            </Select.SelectContent>
+          </Select.Select>
           <FormMessage />
         </FormItem>
       )}

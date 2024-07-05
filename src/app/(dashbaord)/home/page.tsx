@@ -1,9 +1,7 @@
-import { slugToTitle } from '~/lib/utils';
-
 const DashboardPage = () => {
   return (
     <div>
-      <h1>{slugToTitle('home_page-demo')}</h1>
+      <h1>Home Page is coming soon</h1>
     </div>
   );
 };

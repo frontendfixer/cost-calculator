@@ -8,21 +8,21 @@ import {
 } from '~/components/ui/card';
 import SignInButton from '~/components/SignInButton';
 import { constants } from '~/constants';
-import Logo from '~/components/Logo';
+import WalletAnimation from '~/components/WalletAnimation';
 
 export default function HomePage() {
   return (
     <main className="flex h-screen flex-col items-center justify-center p-4">
-      <Card className="w-[90vw] max-w-md shadow-lg">
-        <CardHeader>
-          <CardTitle className="text-2xl font-bold md:text-3xl">
+      <Card className="w-[90vw] max-w-md border-0">
+        <CardHeader className="text-center">
+          <CardTitle className="text-center text-3xl font-bold">
             {constants.app_name}
           </CardTitle>
           <CardDescription>{constants.app_description}</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="my-8 flex flex-col items-center justify-center gap-8">
-            <Logo className="size-[120px]" />
+            <WalletAnimation />
             <SignInButton />
           </div>
         </CardContent>
