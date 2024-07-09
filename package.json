@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@auth/drizzle-adapter": "^0.7.0",
+    "@ducanh2912/next-pwa": "^10.2.7",
     "@hookform/resolvers": "^3.4.2",
     "@libsql/client": "^0.6.0",
     "@radix-ui/react-dialog": "^1.0.5",
@@ -75,7 +76,8 @@
     "prettier": "^3.2.5",
     "prettier-plugin-tailwindcss": "^0.5.14",
     "tailwindcss": "^3.4.3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "webpack": "^5.92.1"
   },
   "engines": {
     "node": ">=20",

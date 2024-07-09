@@ -8,7 +8,7 @@ import { cn, titleCase } from '~/lib/utils';
 import { Separator } from '~/components/ui/separator';
 import { MoveDownRight, MoveUpRight } from 'lucide-react';
 import { type TListItems } from '../actions/actions';
-import { useEffect, useState } from 'react';
+import { Fragment, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ListItemsSkeleton from '../components/ListItemsSkeleton';
 import { queryKeys } from '~/app/Context/QueryKeys';
@@ -52,9 +52,8 @@ const SpendingList = () => {
             <p>No transactions found</p>
           ) : (
             spendingList.map((item, k) => (
-              <>
+              <Fragment key={item.id}>
                 <div
-                  key={item.id}
                   className={cn(
                     'flex items-center justify-between rounded-lg p-2',
                   )}
@@ -104,7 +103,7 @@ const SpendingList = () => {
                   </div>
                 </div>
                 {spendingListQuery?.data!.length - 1 !== k && <Separator />}
-              </>
+              </Fragment>
             ))
           )}
         </div>

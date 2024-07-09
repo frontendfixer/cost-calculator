@@ -12,7 +12,7 @@ import WalletAnimation from '~/components/WalletAnimation';
 
 export default function HomePage() {
   return (
-    <main className="flex h-screen flex-col items-center justify-center p-4">
+    <main className="flex h-[100svh] flex-col items-center justify-center p-4">
       <Card className="w-[90vw] max-w-md border-0">
         <CardHeader className="text-center">
           <CardTitle className="text-center text-3xl font-bold">
