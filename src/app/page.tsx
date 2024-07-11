@@ -9,8 +9,15 @@ import {
 import SignInButton from '~/components/SignInButton';
 import { constants } from '~/constants';
 import WalletAnimation from '~/components/WalletAnimation';
+import { isValidSessionUser } from './actions';
+import { redirect } from 'next/navigation';
 
-export default function HomePage() {
+export default async function HomePage() {
+  const isValidSession = await isValidSessionUser();
+  if (isValidSession) {
+    redirect('/home');
+  }
+
   return (
     <main className="flex h-[100svh] flex-col items-center justify-center p-4">
       <Card className="w-[90vw] max-w-md border-0">

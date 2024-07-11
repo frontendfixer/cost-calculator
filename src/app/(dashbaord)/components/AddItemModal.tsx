@@ -28,20 +28,13 @@ import { StatusCodes } from 'http-status-codes';
 import { useState } from 'react';
 import Icon from '~/components/Icon';
 import { queryKeys } from '~/app/Context/QueryKeys';
+import { addItemCategoryList } from '~/server/db/schema';
 
 export const AddItemSchema = z.object({
   transaction_type: z.enum(['credit', 'debit']),
   date: z.date(),
   amount: z.string().regex(/^[0-9]+$/, 'Amount must be a number'),
-  category: z.enum([
-    'food',
-    'grocery',
-    'entertainment',
-    'other',
-    'salary',
-    'loan',
-    'investment',
-  ]),
+  category: z.enum(addItemCategoryList),
   payment_method: z.enum(['cash', 'online']),
   title: z.string().min(1, { message: 'Title is required' }),
 });
@@ -137,6 +130,7 @@ export default function AddItemModal() {
                 form.getValues('transaction_type') === 'debit'
                   ? [
                       { label: 'Food', value: 'food' },
+                      { label: 'Medicine', value: 'medicine' },
                       { label: 'Grocery', value: 'grocery' },
                       { label: 'Entertainment', value: 'entertainment' },
                       { label: 'Investment', value: 'investment' },

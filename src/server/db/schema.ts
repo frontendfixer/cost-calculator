@@ -11,6 +11,16 @@ import {
 } from 'drizzle-orm/mysql-core';
 import { type AdapterAccount } from 'next-auth/adapters';
 
+export const addItemCategoryList = [
+  'food',
+  'medicine',
+  'grocery',
+  'entertainment',
+  'other',
+  'salary',
+  'loan',
+  'investment',
+] as const;
 /**
  * This is an example of how to use the multi-project schema feature of Drizzle ORM. Use the same
  * database instance for multiple projects.
@@ -121,15 +131,7 @@ export const dailyExpenseList = createTable('daily_expense_list', {
     fsp: 3,
   }).notNull(),
   amount: int('amount').notNull(),
-  category: mysqlEnum('category', [
-    'food',
-    'grocery',
-    'entertainment',
-    'other',
-    'salary',
-    'loan',
-    'investment',
-  ])
+  category: mysqlEnum('category', addItemCategoryList)
     .notNull()
     .default('other'),
   paymentMethod: mysqlEnum('payment_method', ['cash', 'online'])

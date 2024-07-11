@@ -15,6 +15,13 @@
       "when": 1720200360009,
       "tag": "0001_empty_moira_mactaggert",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1720660110827,
+      "tag": "0002_gorgeous_stellaris",
+      "breakpoints": true
     }
   ]
 }

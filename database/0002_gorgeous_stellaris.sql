@@ -1,0 +1,1 @@
+ALTER TABLE `cc_daily_expense_list` MODIFY COLUMN `category` enum('food','medicine','grocery','entertainment','other','salary','loan','investment') NOT NULL DEFAULT 'other';

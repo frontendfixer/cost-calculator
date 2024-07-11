@@ -3,6 +3,8 @@ import Image from 'next/image';
 import { placeholderBlurHash } from '~/lib/utils';
 import SignOutButton from '~/components/SignOutButton';
 import { User } from '../actions';
+import { Switch } from '~/components/ui/switch';
+import ThemeSwitcher from '~/components/ThemeSelector';
 
 const ProfilePage = async () => {
   const session = await getServerAuthSession();
@@ -26,9 +28,16 @@ const ProfilePage = async () => {
             <h3>{user.email}</h3>
           </div>
         </div>
+        <div className="mt-8">
+          <div className="flex items-center justify-between rounded-lg border bg-accent p-3 text-accent-foreground">
+            <h3>Switch themes</h3>
+            <ThemeSwitcher />
+          </div>
+        </div>
+      </div>
+      <div className="space-y-3">
         <SignOutButton />
       </div>
-      <div className="space-y-3"></div>
     </div>
   );
 };

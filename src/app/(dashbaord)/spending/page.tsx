@@ -1,3 +1,4 @@
+import { ScrollArea } from '~/components/ui/scroll-area';
 import Filters from './Filters';
 import SpendingList from './SpendingList';
 import Statistic from './Statistic';
@@ -10,7 +11,9 @@ const SpendingPage = () => {
         <h1 className="text-2xl font-extrabold">Transactions</h1>
         <Filters />
       </div>
-      <SpendingList />
+      <ScrollArea className="h-full">
+        <SpendingList />
+      </ScrollArea>
     </div>
   );
 };
