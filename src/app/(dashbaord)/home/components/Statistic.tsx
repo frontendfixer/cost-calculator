@@ -1,11 +1,11 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Transactions } from '../actions';
 import Image from 'next/image';
 import { Separator } from '~/components/ui/separator';
 import { Skeleton } from '~/components/ui/skeleton';
 import { queryKeys } from '~/app/Context/QueryKeys';
+import { Transactions } from '../../actions';
 
 const Statistic = () => {
   const queryData = useQuery({
@@ -14,14 +14,15 @@ const Statistic = () => {
   });
 
   return (
-    <div className="grid grid-cols-2 gap-3 p-2">
+    <div className="">
       {!queryData.data ? (
-        <>
+        <div className="grid grid-cols-2 gap-3">
           <Skeleton className="h-20 rounded-lg" />
           <Skeleton className="h-20 rounded-lg" />
-        </>
+        </div>
       ) : (
-        <>
+        <div className="grid grid-cols-2 gap-3 rounded-lg border bg-muted p-2">
+          <h3 className="col-span-2 text-muted-foreground">This month</h3>
           <div className="flex items-center gap-1 rounded-lg bg-success/20 p-2">
             <Image
               src={'/icons/cash-in.svg'}
@@ -34,7 +35,7 @@ const Statistic = () => {
               {queryData.data?.data.totalIncome}
             </h1>
           </div>
-          <div className="flex items-center gap-1 rounded-lg bg-destructive/20 p-3">
+          <div className="flex items-center gap-2 rounded-lg bg-destructive/20 p-3">
             <Image
               src={'/icons/cash-out.svg'}
               alt="logo"
@@ -46,7 +47,7 @@ const Statistic = () => {
               {queryData.data?.data.totalExpense}
             </h1>
           </div>
-        </>
+        </div>
       )}
     </div>
   );

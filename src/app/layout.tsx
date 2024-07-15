@@ -32,7 +32,7 @@ export default function RootLayout({ children }: RootLayoutProps) {
       <head />
       <body
         className={cn(
-          'bg-background font-sans text-foreground antialiased',
+          'mx-auto max-w-screen-sm bg-background font-sans text-foreground antialiased',
           fontSans.variable,
         )}
       >

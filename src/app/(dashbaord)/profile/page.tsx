@@ -15,7 +15,7 @@ const ProfilePage = async () => {
   return (
     <div className="grid h-full grid-rows-[1fr_auto] py-5">
       <div className="space-y-3">
-        <div className="flex items-center justify-between gap-3 rounded-lg border p-3">
+        <div className="flex items-center justify-between gap-3 rounded-lg  border bg-muted p-3 text-muted-foreground">
           <Image
             src={user.image ? user.image : placeholderBlurHash}
             alt="profile image"

@@ -40,7 +40,7 @@ const Footer = () => {
   const pathName = usePathname();
   return (
     <footer
-      className="relative grid items-center justify-between gap-3 rounded-lg bg-accent p-2 text-accent-foreground"
+      className="relative grid items-center justify-between gap-2 rounded-lg bg-accent p-2 text-accent-foreground"
       style={{
         gridTemplateColumns: `repeat(${menuItems.length + 1}, minmax(0, 1fr))`,
       }}

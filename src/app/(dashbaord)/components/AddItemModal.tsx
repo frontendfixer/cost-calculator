@@ -91,7 +91,7 @@ export default function AddItemModal() {
     <Dialog.Dialog open={open} onOpenChange={setOpen}>
       <Dialog.DialogTrigger>
         <Button size="icon" asChild>
-          <Plus size={16} />
+          <Plus />
         </Button>
       </Dialog.DialogTrigger>
       <Dialog.DialogContent>
@@ -132,6 +132,8 @@ export default function AddItemModal() {
                       { label: 'Food', value: 'food' },
                       { label: 'Medicine', value: 'medicine' },
                       { label: 'Grocery', value: 'grocery' },
+                      { label: 'Market', value: 'market' },
+                      { label: 'Clothing', value: 'clothing' },
                       { label: 'Entertainment', value: 'entertainment' },
                       { label: 'Investment', value: 'investment' },
                       { label: 'Other', value: 'other' },
@@ -139,6 +141,8 @@ export default function AddItemModal() {
                   : [
                       { label: 'Salary', value: 'salary' },
                       { label: 'Loan', value: 'loan' },
+                      { label: 'Borrowing', value: 'borrowing' },
+                      { label: 'Donation', value: 'donation' },
                       { label: 'Other', value: 'other' },
                     ]
               }

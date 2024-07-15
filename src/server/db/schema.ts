@@ -15,10 +15,14 @@ export const addItemCategoryList = [
   'food',
   'medicine',
   'grocery',
+  'market',
+  'clothing',
   'entertainment',
   'other',
   'salary',
   'loan',
+  'borrowing',
+  'donation',
   'investment',
 ] as const;
 /**

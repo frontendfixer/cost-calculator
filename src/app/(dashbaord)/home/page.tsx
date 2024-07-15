@@ -1,7 +1,17 @@
-const DashboardPage = () => {
+import { getServerAuthSession } from '~/server/auth';
+import Statistic from './components/Statistic';
+import ChartReport from './components/ChartReport';
+
+const DashboardPage = async () => {
+  const session = await getServerAuthSession();
   return (
-    <div>
-      <h1>Home Page is coming soon</h1>
+    <div className="space-y-4 p-3">
+      <h1>
+        <span className="text-muted-foreground">Welcome</span> <br />
+        <strong className="text-xl">{session?.user.name} </strong>
+      </h1>
+      <Statistic />
+      <ChartReport />
     </div>
   );
 };

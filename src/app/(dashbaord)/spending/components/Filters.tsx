@@ -1,6 +1,5 @@
 'use client';
 
-import { BadgeMinus, BadgePlus } from 'lucide-react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { ToggleGroup, ToggleGroupItem } from '~/components/ui/toggle-group';
 
@@ -18,15 +17,23 @@ const Filters = () => {
   return (
     <ToggleGroup
       type="single"
-      variant={'outline'}
       value={type}
+      variant="outline"
+      size="sm"
       onValueChange={handleTypeChange}
+      className="gap-2"
     >
-      <ToggleGroupItem value="credit">
-        <BadgePlus className="h-4 w-4" />
+      <ToggleGroupItem
+        value="credit"
+        className="border-success text-success data-[state=on]:bg-success"
+      >
+        Credited
       </ToggleGroupItem>
-      <ToggleGroupItem value="debit">
-        <BadgeMinus className="h-4 w-4" />
+      <ToggleGroupItem
+        value="debit"
+        className="border-destructive text-destructive data-[state=on]:bg-destructive"
+      >
+        Debited
       </ToggleGroupItem>
     </ToggleGroup>
   );

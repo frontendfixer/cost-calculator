@@ -23,7 +23,7 @@ const Header = () => {
     }
   }, [queryData.data]);
   return (
-    <header className="mb-3 flex items-center justify-between border-b p-2 pb-3 shadow">
+    <header className="flex items-center justify-between border-b p-2 pb-3 shadow">
       <div className="flex items-end gap-4">
         <Logo className="" />
         <h1 className="hidden text-2xl font-semibold">

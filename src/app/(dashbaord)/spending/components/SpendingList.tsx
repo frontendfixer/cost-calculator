@@ -1,17 +1,36 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
-import { Transactions } from '../actions';
+import { Transactions } from '../../actions';
 import { StatusCodes } from 'http-status-codes';
 import Icon from '~/components/Icon';
 import { cn, titleCase } from '~/lib/utils';
 import { Separator } from '~/components/ui/separator';
-import { MoveDownRight, MoveUpRight } from 'lucide-react';
-import { type TListItems } from '../actions/actions';
+import { type icons, MoveDownRight, MoveUpRight } from 'lucide-react';
+import { type TListItems } from '../../actions/actions';
 import { Fragment, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
-import ListItemsSkeleton from '../components/ListItemsSkeleton';
+import ListItemsSkeleton from '../../components/ListItemsSkeleton';
 import { queryKeys } from '~/app/Context/QueryKeys';
+import { type addItemCategoryList } from '~/server/db/schema';
+
+const ListItemIcon: Record<
+  (typeof addItemCategoryList)[number],
+  keyof typeof icons
+> = {
+  food: 'Salad',
+  entertainment: 'Drum',
+  borrowing: 'IndianRupee',
+  clothing: 'Shirt',
+  grocery: 'ShoppingCart',
+  market: 'Wheat',
+  donation: 'HandCoins',
+  investment: 'CandlestickChart',
+  loan: 'Banknote',
+  medicine: 'Pill',
+  salary: 'Wallet',
+  other: 'ReceiptIndianRupee',
+};
 
 const SpendingList = () => {
   const searchParams = useSearchParams();
@@ -60,22 +79,7 @@ const SpendingList = () => {
                 >
                   <div className="flex items-center gap-3">
                     <div className="grid size-8 place-content-center rounded-full bg-primary p-2 text-primary-foreground">
-                      <Icon
-                        name={
-                          item.category === 'food'
-                            ? 'Salad'
-                            : item.category === 'grocery'
-                              ? 'ShoppingBasket'
-                              : item.category === 'entertainment'
-                                ? 'Videotape'
-                                : item.category === 'investment'
-                                  ? 'BarChart'
-                                  : item.category === 'salary'
-                                    ? 'DollarSign'
-                                    : 'Shell'
-                        }
-                        size={20}
-                      />
+                      <Icon name={ListItemIcon[item.category]} size={20} />
                     </div>
                     <div>
                       <h3 className="font-bold">{titleCase(item.title)}</h3>
