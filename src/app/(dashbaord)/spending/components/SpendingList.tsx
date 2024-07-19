@@ -1,18 +1,26 @@
 'use client';
 
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query';
 import { Transactions } from '../../actions';
 import { StatusCodes } from 'http-status-codes';
 import Icon from '~/components/Icon';
 import { cn, titleCase } from '~/lib/utils';
 import { Separator } from '~/components/ui/separator';
-import { type icons, MoveDownRight, MoveUpRight } from 'lucide-react';
+import {
+  type icons,
+  Loader2,
+  MoveDownRight,
+  MoveUpRight,
+  Trash2,
+} from 'lucide-react';
 import { type TListItems } from '../../actions/actions';
 import { Fragment, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import ListItemsSkeleton from '../../components/ListItemsSkeleton';
-import { queryKeys } from '~/app/Context/QueryKeys';
+import { MutationKeys, queryKeys } from '~/app/Context/QueryKeys';
 import { type addItemCategoryList } from '~/server/db/schema';
+import { Button } from '~/components/ui/button';
+import toast from 'react-hot-toast';
 
 const ListItemIcon: Record<
   (typeof addItemCategoryList)[number],
@@ -20,7 +28,8 @@ const ListItemIcon: Record<
 > = {
   food: 'Salad',
   entertainment: 'Drum',
-  borrowing: 'IndianRupee',
+  lend: 'Banknote',
+  borrow: 'IndianRupee',
   clothing: 'Shirt',
   grocery: 'ShoppingCart',
   market: 'Wheat',
@@ -37,6 +46,19 @@ const SpendingList = () => {
   const type = searchParams.get('type') ?? '';
   const [spendingList, setSpendingList] = useState<TListItems>([]);
 
+  const queryClient = useQueryClient();
+
+  const invalidateQueries = async () => {
+    return await Promise.all([
+      queryClient.invalidateQueries({
+        queryKey: [queryKeys.spendingList],
+      }),
+      queryClient.invalidateQueries({
+        queryKey: [queryKeys.currentMonthBalance],
+      }),
+    ]);
+  };
+
   const spendingListQuery = useQuery({
     queryKey: [queryKeys.spendingList],
     queryFn: async () => {
@@ -46,6 +68,18 @@ const SpendingList = () => {
         return list.data;
       }
       return [];
+    },
+  });
+  const deleteItemMutation = useMutation({
+    mutationKey: [MutationKeys.deleteItem],
+    mutationFn: async (id: string) => {
+      const query = await Transactions.delete(id);
+      if (query.status === StatusCodes.OK) {
+        toast.success(query.message);
+        await invalidateQueries();
+      } else {
+        toast.error(query.message);
+      }
     },
   });
 
@@ -66,7 +100,7 @@ const SpendingList = () => {
       {spendingListQuery.isLoading ? (
         <ListItemsSkeleton />
       ) : (
-        <div className="mb-2 h-full space-y-2 rounded-md bg-muted/20 p-2">
+        <div className="my-2 h-full space-y-2 rounded-md bg-muted/20">
           {!spendingList?.length ? (
             <p>No transactions found</p>
           ) : (
@@ -105,6 +139,23 @@ const SpendingList = () => {
                       <MoveUpRight size={20} className="text-success" />
                     )}
                   </div>
+                  <Button
+                    size="icon"
+                    className="size-8"
+                    variant="destructive"
+                    disabled={
+                      deleteItemMutation.isPending &&
+                      deleteItemMutation.variables === item.id
+                    }
+                    onClick={() => deleteItemMutation.mutate(item.id)}
+                  >
+                    {deleteItemMutation.isPending &&
+                    deleteItemMutation.variables === item.id ? (
+                      <Loader2 size={16} className="animate-spin" />
+                    ) : (
+                      <Trash2 size={16} />
+                    )}
+                  </Button>
                 </div>
                 {spendingListQuery?.data!.length - 1 !== k && <Separator />}
               </Fragment>

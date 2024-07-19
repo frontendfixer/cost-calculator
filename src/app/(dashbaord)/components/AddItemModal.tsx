@@ -29,6 +29,7 @@ import { useState } from 'react';
 import Icon from '~/components/Icon';
 import { queryKeys } from '~/app/Context/QueryKeys';
 import { addItemCategoryList } from '~/server/db/schema';
+import { usePathname } from 'next/navigation';
 
 export const AddItemSchema = z.object({
   transaction_type: z.enum(['credit', 'debit']),
@@ -56,18 +57,37 @@ export default function AddItemModal() {
   });
 
   const queryClient = useQueryClient();
+  const pathName = usePathname();
+
   const invalidateQueries = async () => {
-    return await Promise.all([
-      queryClient.invalidateQueries({
-        queryKey: [queryKeys.spendingList],
-        exact: true,
-      }),
-      queryClient.invalidateQueries({
-        queryKey: [queryKeys.spendingStatistic],
-        exact: true,
-      }),
-    ]);
+    if (pathName === '/spending') {
+      return await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.spendingList],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.currentMonthBalance],
+        }),
+      ]);
+    } else if (pathName === '/home') {
+      return await Promise.all([
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.currentMonthBalance],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.spendingStatistic],
+        }),
+        queryClient.invalidateQueries({
+          queryKey: [queryKeys.monthWiseStatistic],
+        }),
+      ]);
+    } else {
+      return await queryClient.invalidateQueries({
+        queryKey: [queryKeys.currentMonthBalance],
+      });
+    }
   };
+
   const SubmitMutation = useMutation({
     mutationKey: ['add-item'],
     mutationFn: async (data: TAddItemSchema) => await Transactions.add(data),
@@ -135,13 +155,14 @@ export default function AddItemModal() {
                       { label: 'Market', value: 'market' },
                       { label: 'Clothing', value: 'clothing' },
                       { label: 'Entertainment', value: 'entertainment' },
+                      { label: 'Lending', value: 'lend' },
                       { label: 'Investment', value: 'investment' },
                       { label: 'Other', value: 'other' },
                     ]
                   : [
                       { label: 'Salary', value: 'salary' },
                       { label: 'Loan', value: 'loan' },
-                      { label: 'Borrowing', value: 'borrowing' },
+                      { label: 'Borrowing', value: 'borrow' },
                       { label: 'Donation', value: 'donation' },
                       { label: 'Other', value: 'other' },
                     ]

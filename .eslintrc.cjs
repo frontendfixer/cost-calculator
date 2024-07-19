@@ -4,15 +4,17 @@ const config = {
   parserOptions: {
     project: true,
   },
-  plugins: ['@typescript-eslint', 'drizzle', '@tanstack/query'],
+  plugins: ['@typescript-eslint', 'drizzle'],
   extends: [
     'next/core-web-vitals',
     'plugin:@typescript-eslint/recommended-type-checked',
     'plugin:@typescript-eslint/stylistic-type-checked',
     'plugin:prettier/recommended',
+    'plugin:@tanstack/eslint-plugin-query/recommended',
   ],
   rules: {
     '@typescript-eslint/array-type': 'off',
+    '@typescript-eslint/no-floating-promises': 'off',
     '@typescript-eslint/consistent-type-definitions': 'off',
     '@typescript-eslint/consistent-type-imports': [
       'warn',

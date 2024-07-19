@@ -21,7 +21,8 @@ export const addItemCategoryList = [
   'other',
   'salary',
   'loan',
-  'borrowing',
+  'lend',
+  'borrow',
   'donation',
   'investment',
 ] as const;

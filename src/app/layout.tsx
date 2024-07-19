@@ -4,6 +4,7 @@ import { Inter as FontSans } from 'next/font/google';
 import { cn } from '~/lib/utils';
 import Providers from './Context/Providers';
 import type { Metadata, Viewport } from 'next';
+import { constants } from '~/constants';
 
 const fontSans = FontSans({
   subsets: ['latin'],
@@ -11,8 +12,8 @@ const fontSans = FontSans({
 });
 
 export const metadata: Metadata = {
-  title: 'Cost Calculator',
-  description: 'Manage your costs with ease',
+  title: constants.app_name,
+  description: constants.app_description,
   icons: [{ rel: 'icon', url: '/favicon.ico' }],
   manifest: '/manifest.json',
 };
