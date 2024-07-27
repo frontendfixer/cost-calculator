@@ -1,5 +1,5 @@
-import { relations, sql } from 'drizzle-orm';
 import { cuid2 as cuid } from 'drizzle-cuid2/mysql';
+import { relations, sql } from 'drizzle-orm';
 import {
   index,
   int,

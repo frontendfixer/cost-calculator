@@ -1,11 +1,10 @@
 'use client';
 
 import { useQuery } from '@tanstack/react-query';
+import { format } from 'date-fns';
+import { TrendingUp } from 'lucide-react';
 import Image from 'next/image';
-import { Separator } from '~/components/ui/separator';
-import { Skeleton } from '~/components/ui/skeleton';
 import { queryKeys } from '~/app/Context/QueryKeys';
-import { Transactions } from '../../actions';
 import {
   Card,
   CardContent,
@@ -13,8 +12,9 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
-import { format } from 'date-fns';
-import { TrendingUp } from 'lucide-react';
+import { Separator } from '~/components/ui/separator';
+import { Skeleton } from '~/components/ui/skeleton';
+import { Transactions } from '../../actions';
 
 const Statistic = () => {
   const statData = useQuery({

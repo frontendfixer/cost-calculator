@@ -4,6 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 import { Card, CardContent, CardHeader } from '~/components/ui/card';
 
+import { StatusCodes } from 'http-status-codes';
+import { queryKeys } from '~/app/Context/QueryKeys';
 import {
   type ChartConfig,
   ChartContainer,
@@ -13,8 +15,6 @@ import {
   ChartTooltipContent,
 } from '~/components/ui/chart';
 import { Transactions } from '../../actions';
-import { StatusCodes } from 'http-status-codes';
-import { queryKeys } from '~/app/Context/QueryKeys';
 
 const ChartReport = () => {
   const chartConfig = {

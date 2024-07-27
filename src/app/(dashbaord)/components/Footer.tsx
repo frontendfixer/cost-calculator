@@ -1,11 +1,11 @@
 'use client';
 
+import { format } from 'date-fns';
 import { type icons } from 'lucide-react';
 import Link from 'next/link';
+import { usePathname } from 'next/navigation';
 import Icon from '~/components/Icon';
 import { cn } from '~/lib/utils';
-import { format } from 'date-fns';
-import { usePathname } from 'next/navigation';
 import AddItemModal from './AddItemModal';
 
 const currentMonth = format(new Date(), 'MMMM');

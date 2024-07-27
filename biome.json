@@ -125,5 +125,9 @@
         }
       }
     }
-  ]
+  ],
+  "files": {
+    "include": ["src/**/*"],
+    "ignore": [".next/**/*", "node_modules/**/*", "public/**/*"]
+  }
 }

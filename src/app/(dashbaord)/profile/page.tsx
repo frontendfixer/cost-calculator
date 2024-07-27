@@ -1,9 +1,9 @@
-import { getServerAuthSession } from '~/server/auth';
 import Image from 'next/image';
-import { placeholderBlurHash } from '~/lib/utils';
 import SignOutButton from '~/components/SignOutButton';
-import { User } from '../actions';
 import ThemeSwitcher from '~/components/ThemeSelector';
+import { placeholderBlurHash } from '~/lib/utils';
+import { getServerAuthSession } from '~/server/auth';
+import { User } from '../actions';
 
 const ProfilePage = async () => {
   const session = await getServerAuthSession();

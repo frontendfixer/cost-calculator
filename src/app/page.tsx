@@ -1,3 +1,6 @@
+import { redirect } from 'next/navigation';
+import SignInButton from '~/components/SignInButton';
+import WalletAnimation from '~/components/WalletAnimation';
 import {
   Card,
   CardContent,
@@ -6,11 +9,8 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
-import SignInButton from '~/components/SignInButton';
 import { constants } from '~/constants';
-import WalletAnimation from '~/components/WalletAnimation';
 import { isValidSessionUser } from './actions';
-import { redirect } from 'next/navigation';
 
 export default async function HomePage() {
   const isValidSession = await isValidSessionUser();

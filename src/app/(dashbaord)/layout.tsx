@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react';
-import Header from './components/Header';
-import Footer from './components/Footer';
 import { ScrollArea } from '~/components/ui/scroll-area';
+import Footer from './components/Footer';
+import Header from './components/Header';
 
 const DashboardLayout = ({ children }: { children: React.ReactNode }) => {
   return (

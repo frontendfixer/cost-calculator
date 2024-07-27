@@ -1,10 +1,10 @@
 import '~/styles/globals.css';
 
+import type { Metadata, Viewport } from 'next';
 import { Inter as FontSans } from 'next/font/google';
+import { constants } from '~/constants';
 import { cn } from '~/lib/utils';
 import Providers from './Context/Providers';
-import type { Metadata, Viewport } from 'next';
-import { constants } from '~/constants';
 
 const fontSans = FontSans({
   subsets: ['latin'],

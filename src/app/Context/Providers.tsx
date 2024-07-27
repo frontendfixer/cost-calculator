@@ -1,9 +1,9 @@
 'use client';
 
-import { ThemeProvider } from './ThemeProviders';
-import { Toaster } from 'react-hot-toast';
 import React from 'react';
+import { Toaster } from 'react-hot-toast';
 import { ReactQueryProvider } from './ReactQueryProvider';
+import { ThemeProvider } from './ThemeProviders';
 
 const Providers = ({ children }: { children: React.ReactNode }) => {
   return (

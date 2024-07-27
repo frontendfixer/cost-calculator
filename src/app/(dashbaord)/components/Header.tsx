@@ -4,8 +4,8 @@ import { useQuery } from '@tanstack/react-query';
 import { queryKeys } from '~/app/Context/QueryKeys';
 import Logo from '~/components/Logo';
 import { constants } from '~/constants';
-import { Statistics } from '../actions';
 import { cn } from '~/lib/utils';
+import { Statistics } from '../actions';
 
 const Header = () => {
   const queryData = useQuery({

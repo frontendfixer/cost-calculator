@@ -1,6 +1,6 @@
 import { getServerAuthSession } from '~/server/auth';
-import Statistic from './components/Statistic';
 import ChartReport from './components/ChartReport';
+import Statistic from './components/Statistic';
 
 const DashboardPage = async () => {
   const session = await getServerAuthSession();

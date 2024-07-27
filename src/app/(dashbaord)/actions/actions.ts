@@ -1,11 +1,5 @@
 'use server';
 
-import { and, between, desc, eq } from 'drizzle-orm';
-import { db } from '~/server/db';
-import { dailyExpenseList, users } from '~/server/db/schema';
-import { type TAddItemSchema } from '../components/AddItemModal';
-import { getServerAuthSession } from '~/server/auth';
-import { StatusCodes } from 'http-status-codes';
 import {
   endOfMonth,
   endOfYear,
@@ -13,6 +7,12 @@ import {
   startOfMonth,
   startOfYear,
 } from 'date-fns';
+import { and, between, desc, eq } from 'drizzle-orm';
+import { StatusCodes } from 'http-status-codes';
+import { getServerAuthSession } from '~/server/auth';
+import { db } from '~/server/db';
+import { dailyExpenseList, users } from '~/server/db/schema';
+import { type TAddItemSchema } from '../components/AddItemModal';
 
 // ############# Users ############
 export async function getUser(id: string) {
@@ -313,6 +313,7 @@ export async function categoryWiseStat() {
       },
     };
   } catch (e) {
+    console.log(e);
     return {
       status: StatusCodes.INTERNAL_SERVER_ERROR,
       message: 'Something went wrong',
