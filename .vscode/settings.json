@@ -1,0 +1,14 @@
+{
+  "editor.formatOnSave": true,
+  "notebook.defaultFormatter": "biomejs.biome",
+
+  "[javascript][javascriptreact][typescript][typescriptreact]": {
+    "editor.formatOnSave": false,
+    "editor.defaultFormatter": "biomejs.biome"
+  },
+
+  "editor.codeActionsOnSave": {
+    "quickfix.biome": "explicit",
+    "source.organizeImports.biome": "explicit"
+  }
+}

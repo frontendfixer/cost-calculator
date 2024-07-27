@@ -1,6 +1,7 @@
 import { type TAddItemSchema } from '../components/AddItemModal';
 import {
   addItem,
+  categoryWiseStat,
   currentMonthBalance,
   deleteItem,
   getUser,
@@ -24,5 +25,6 @@ export const Transactions = {
 export const Statistics = {
   balance: async () => await currentMonthBalance(),
   monthWise: async () => await monthWiseStat(),
+  categoryWise: async () => await categoryWiseStat(),
   spending: async () => await spendingStat(),
 };

@@ -6,7 +6,13 @@ import { dailyExpenseList, users } from '~/server/db/schema';
 import { type TAddItemSchema } from '../components/AddItemModal';
 import { getServerAuthSession } from '~/server/auth';
 import { StatusCodes } from 'http-status-codes';
-import { endOfMonth, format, startOfMonth } from 'date-fns';
+import {
+  endOfMonth,
+  endOfYear,
+  format,
+  startOfMonth,
+  startOfYear,
+} from 'date-fns';
 
 // ############# Users ############
 export async function getUser(id: string) {
@@ -172,6 +178,11 @@ export async function monthWiseStat() {
     where: and(
       eq(dailyExpenseList.userId, user_id),
       eq(dailyExpenseList.status, 'active'),
+      between(
+        dailyExpenseList.date,
+        startOfYear(new Date()),
+        endOfYear(new Date()),
+      ),
     ),
     orderBy: [desc(dailyExpenseList.date)],
   });
@@ -212,6 +223,101 @@ export async function monthWiseStat() {
     message: 'Items fetched successfully',
     data: monthWiseStat,
   };
+}
+
+export async function categoryWiseStat() {
+  const user_id = await getServerAuthSession().then(
+    session => session?.user?.id,
+  );
+  if (!user_id) {
+    throw new Error('User not found');
+  }
+
+  try {
+    const query = await db.query.dailyExpenseList.findMany({
+      where: and(
+        eq(dailyExpenseList.userId, user_id),
+        eq(dailyExpenseList.status, 'active'),
+        between(
+          dailyExpenseList.date,
+          startOfMonth(new Date()),
+          endOfMonth(new Date()),
+        ),
+      ),
+      orderBy: [desc(dailyExpenseList.date)],
+    });
+
+    const expenses = query.filter(item => item.transaction_type === 'debit');
+    const totalExpense = expenses.reduce((acc, item) => acc + item.amount, 0);
+    const expensesStat = Object.values(
+      expenses.reduce(
+        (
+          acc: Record<
+            string,
+            { category: string; spending: number; percentage: number }
+          >,
+          item,
+        ) => {
+          if (!acc[item.category]) {
+            acc[item.category] = {
+              category: item.category,
+              spending: 0,
+              percentage: 0,
+            };
+          }
+          acc[item.category]!.spending += item.amount;
+          acc[item.category]!.percentage =
+            (acc[item.category]!.spending / totalExpense) * 100;
+          return acc;
+        },
+        {},
+      ),
+    );
+
+    const income = query.filter(item => item.transaction_type === 'credit');
+    const totalIncome = income.reduce((acc, item) => acc + item.amount, 0);
+    const incomeStat = Object.values(
+      income.reduce(
+        (
+          acc: Record<
+            string,
+            { category: string; spending: number; percentage: number }
+          >,
+          item,
+        ) => {
+          if (!acc[item.category]) {
+            acc[item.category] = {
+              category: item.category,
+              spending: 0,
+              percentage: 0,
+            };
+          }
+          acc[item.category]!.spending += item.amount;
+          acc[item.category]!.percentage =
+            (acc[item.category]!.spending / totalIncome) * 100;
+          return acc;
+        },
+        {},
+      ),
+    );
+
+    return {
+      status: StatusCodes.OK,
+      message: 'Items fetched successfully',
+      data: {
+        expenses: expensesStat.toSorted((a, b) => b.spending - a.spending),
+        totalExpense: totalExpense < 0 ? 0 : totalExpense,
+        income: incomeStat.toSorted((a, b) => b.spending - a.spending),
+        totalIncome: totalIncome < 0 ? 0 : totalIncome,
+        balance: totalIncome - totalExpense,
+      },
+    };
+  } catch (e) {
+    return {
+      status: StatusCodes.INTERNAL_SERVER_ERROR,
+      message: 'Something went wrong',
+    };
+  }
 }
 export async function spendingStat() {
   const user_id = await getServerAuthSession().then(
